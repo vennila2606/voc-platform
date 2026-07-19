@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}VoC Platform — Home{% endblock %}
+{% block content %}
+<section class="hero text-center">
+  <div class="badge-pill mx-auto">⚡ AI-Powered Customer Intelligence</div>
+  <h1 class="hero-title mt-3">Voice of Customer<br><span class="accent">Platform</span></h1>
+  <p class="hero-sub mx-auto">
+    Collect, analyze, and convert customer feedback into actionable insights
+    with real-time sentiment analysis and AI-driven recommendations.
+  </p>
+  <div class="d-flex justify-content-center gap-3 mt-4">
+    <a href="{{ url_for('customer_login') }}" class="btn btn-primary-glow px-4 py-2">💬 Submit Feedback</a>
+    <a href="{{ url_for('admin_login') }}" class="btn btn-outline-light px-4 py-2">⟳ Admin Login</a>
+  </div>
+
+  <div class="row stat-row mt-5 g-3">
+    <div class="col-6 col-md-3">
+      <div class="stat-card">
+        <div class="stat-icon">💬</div>
+        <div class="stat-value">{{ "{:,}".format(stats.reviews_collected) }}</div>
+        <div class="stat-label">Reviews Collected</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div class="stat-value">{{ stats.voice_health_score }}</div>
+        <div class="stat-label">Voice Health Score</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card">
+        <div class="stat-icon">🔄</div>
+        <div class="stat-value">{{ stats.avg_response_time }}</div>
+        <div class="stat-label">Avg. Response Time</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-value">{{ stats.issues_resolved }}</div>
+        <div class="stat-label">Issues Resolved</div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

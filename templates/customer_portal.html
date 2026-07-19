@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Customer Portal{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card text-center">
+    <div class="auth-icon mx-auto">💬</div>
+    <h3 class="mt-3 mb-0">Customer Portal</h3>
+    <p class="text-muted-voc">Sign in or create an account to submit feedback</p>
+
+    <ul class="nav nav-pills voc-tabs justify-content-center mt-3" id="portalTabs">
+      <li class="nav-item">
+        <button class="nav-link {{ 'active' if active_tab != 'register' else '' }}" data-tab="signin">Sign In</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link {{ 'active' if active_tab == 'register' else '' }}" data-tab="register">Register</button>
+      </li>
+    </ul>
+
+    <form method="POST" action="{{ url_for('customer_login') }}" class="text-start mt-4 tab-pane-form" id="signinForm"
+          style="display: {{ 'block' if active_tab != 'register' else 'none' }};">
+      <div class="mb-3">
+        <label class="form-label">Email Address</label>
+        <input type="email" name="email" class="form-control voc-input" placeholder="raj@email.com" required>
+      </div>
+      <div class="mb-1">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control voc-input" placeholder="••••••••" required>
+      </div>
+      <div class="text-end mb-3"><a href="#" class="forgot-link">Forgot password?</a></div>
+      <button type="submit" class="btn btn-primary-glow w-100 py-2">→ Sign In &amp; Continue</button>
+    </form>
+
+    <form method="POST" action="{{ url_for('customer_register') }}" class="text-start mt-4 tab-pane-form" id="registerForm"
+          style="display: {{ 'block' if active_tab == 'register' else 'none' }};">
+      <div class="mb-3">
+        <label class="form-label">Full Name</label>
+        <input type="text" name="name" class="form-control voc-input" placeholder="Raj Kumar" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Email Address</label>
+        <input type="email" name="email" class="form-control voc-input" placeholder="raj@email.com" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control voc-input" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn btn-primary-glow w-100 py-2">Create Account</button>
+    </form>
+
+    <p class="mt-3 mb-0 text-muted-voc">
+      Don't have an account? <a href="#" class="switch-link" data-tab="register">Register</a>
+    </p>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const tabs = document.querySelectorAll('[data-tab]');
+  const signin = document.getElementById('signinForm');
+  const register = document.getElementById('registerForm');
+  const pillTabs = document.querySelectorAll('.voc-tabs .nav-link');
+
+  tabs.forEach(t => t.addEventListener('click', (e) => {
+    e.preventDefault();
+    const tab = t.dataset.tab;
+    signin.style.display = tab === 'signin' ? 'block' : 'none';
+    register.style.display = tab === 'register' ? 'block' : 'none';
+    pillTabs.forEach(p => p.classList.toggle('active', p.dataset.tab === tab));
+  }));
+</script>
+{% endblock %}
