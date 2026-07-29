@@ -75,11 +75,16 @@ class Feedback(db.Model):
 
     # Filled in by AI layer (Week 4/5) — nullable for now
     sentiment = db.Column(db.String(20), nullable=True)
+    sentiment_score = db.Column(db.Float, nullable=True)
     emotion = db.Column(db.String(30), nullable=True)
     intent = db.Column(db.String(50), nullable=True)
+    topic = db.Column(db.String(50), nullable=True)
     priority = db.Column(db.String(20), nullable=True)  # Low, Medium, High, Critical
     department_id = db.Column(db.Integer, db.ForeignKey("departments.id"), nullable=True)
     status = db.Column(db.String(20), default="New")  # New, In Progress, Resolved
     is_authentic = db.Column(db.Boolean, default=True)
+    authenticity_notes = db.Column(db.Text, nullable=True)
+    quality_score = db.Column(db.Integer, nullable=True)
+    proof_image_path = db.Column(db.String(255), nullable=True)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

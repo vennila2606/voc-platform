@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Feedback QR Code{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card text-center">
+    <h3 class="mb-3">Scan to Leave Feedback</h3>
+    <img src="{{ url_for('feedback_qr_image') }}" alt="QR code to feedback form" style="background:#fff; padding:12px; border-radius:12px;">
+    <p class="text-muted-voc mt-3">Or share this link directly:</p>
+    <code class="d-block" style="word-break:break-all;">{{ feedback_url }}</code>
+  </div>
+</div>
+{% endblock %}

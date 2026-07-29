@@ -16,6 +16,9 @@
         <a href="{{ url_for('customer_login') }}">Give Feedback</a>
         {% if current_user.is_authenticated and current_user.__class__.__name__ == 'Admin' %}
           <a href="{{ url_for('dashboard') }}">Dashboard</a>
+          {% if current_user.role == 'admin' %}
+            <a href="{{ url_for('admin_users') }}">Manage Users</a>
+          {% endif %}
           <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-light">Logout</a>
         {% elif current_user.is_authenticated %}
           <a href="{{ url_for('give_feedback') }}">My Feedback</a>

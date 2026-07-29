@@ -3,3 +3,6 @@ Flask-SQLAlchemy==3.1.1
 Flask-Login==0.6.3
 Werkzeug==3.0.3
 python-dotenv==1.0.1
+qrcode==7.4.2
+Pillow
+textblob==0.18.0.post0

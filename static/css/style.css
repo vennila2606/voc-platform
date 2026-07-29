@@ -106,3 +106,35 @@ body {
 }
 
 .voc-alert { border: none; border-radius: 10px; font-size: 0.9rem; }
+
+/* Feedback form */
+.feedback-wrap { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
+.feedback-wrap h2 { font-weight: 700; }
+.feedback-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+}
+.star-rating { font-size: 1.8rem; cursor: pointer; }
+.star { color: #3a4256; transition: color 0.15s; margin-right: 4px; }
+.star.filled { color: #f5b400; }
+
+.category-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill {
+  background: #0d1220;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 0.82rem;
+}
+.pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.upload-box {
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+}
+.upload-label { color: var(--text-muted); cursor: pointer; font-size: 0.85rem; }

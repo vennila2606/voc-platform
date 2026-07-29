@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Import Feedback (CSV){% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <h3 class="text-center mb-1">Import Feedback from CSV</h3>
+    <p class="text-muted-voc text-center">
+      Columns expected: customer_name, contact, product_service, rating, category, review_text
+    </p>
+    <form method="POST" enctype="multipart/form-data" class="mt-4">
+      <input type="file" name="csv_file" accept=".csv" class="form-control voc-input" required>
+      <button type="submit" class="btn btn-primary-glow w-100 py-2 mt-3">Upload &amp; Import</button>
+    </form>
+
+    {% if results %}
+    <div class="mt-4">
+      <p><strong>{{ results.success }}</strong> rows imported successfully.</p>
+      {% if results.errors %}
+        <p class="text-danger">{{ results.errors|length }} rows had errors:</p>
+        <ul class="text-muted-voc" style="font-size:0.8rem;">
+          {% for e in results.errors[:15] %}
+            <li>Row {{ e.row }}: {{ e.message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
