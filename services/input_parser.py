@@ -7,8 +7,14 @@ the "multi-channel" design possible: every channel just builds a dict and
 hands it to this same function.
 """
 
-ALLOWED_CATEGORIES = {"Product", "Service", "Delivery", "Support", "Payment", "Other"}
+ALLOWED_CATEGORIES = {
+    "Mobile Phones", "Home Appliances", "Electronics", "Computers & Laptops",
+    "Accessories", "Software / Applications", "Delivery", "Customer Support",
+    "Payment / Billing", "Other",
+}
 ALLOWED_CHANNELS = {"web", "qr", "csv", "api"}
+ALLOWED_RATINGS = {x / 2 for x in range(0, 11)}  # 0, 0.5, 1, 1.5 ... 5.0
+MAX_REVIEW_WORDS = 250  # item 6: backend-enforced word limit, mirrors the frontend counter
 
 
 def parse_feedback_input(data: dict, channel: str = "web"):
@@ -26,30 +32,42 @@ def parse_feedback_input(data: dict, channel: str = "web"):
     contact = (data.get("contact") or "").strip()
     product_service = (data.get("product_service") or "").strip()
     review_text = (data.get("review_text") or "").strip()
-    category = (data.get("category") or "Other").strip().title()
+    category = (data.get("category") or "Other").strip()
 
     # --- Required fields ---
+    # customer_name/contact are auto-filled server-side from the logged-in
+    # session for the web channel (item 4 — no longer typed by the customer),
+    # but CSV/API submissions still need to supply them explicitly.
     if not customer_name:
         errors.append("Customer name is required.")
     if not contact:
-        errors.append("Email or mobile is required.")
+        errors.append("Contact information is required.")
     if not product_service:
-        errors.append("Product or service name is required.")
+        errors.append("Product name is required.")
+
     if not review_text:
         errors.append("Review text is required.")
-    elif len(review_text) < 10:
-        errors.append("Review text is too short to be useful (min 10 characters).")
+    else:
+        word_count = len(review_text.split())
+        if word_count < 3:
+            errors.append("Review text is too short to be useful.")
+        elif word_count > MAX_REVIEW_WORDS:
+            # Item 6: backend enforcement — cannot be bypassed by editing
+            # the frontend counter or sending a raw request.
+            errors.append(f"Review exceeds the {MAX_REVIEW_WORDS}-word limit ({word_count} words submitted).")
 
-    # --- Rating ---
+    # --- Rating (item 1: 0–5 in 0.5 increments) ---
     try:
-        rating = int(data.get("rating"))
-        if rating < 1 or rating > 5:
-            errors.append("Rating must be between 1 and 5.")
+        rating = float(data.get("rating"))
+        # snap to nearest 0.5 to absorb minor float rounding, then validate range
+        rating = round(rating * 2) / 2
+        if rating not in ALLOWED_RATINGS:
+            errors.append("Rating must be between 0 and 5, in 0.5 increments.")
     except (TypeError, ValueError):
-        errors.append("Rating must be a whole number from 1 to 5.")
+        errors.append("Rating must be a number between 0 and 5.")
         rating = None
 
-    # --- Category ---
+    # --- Category (item 2: fixed dropdown, no arbitrary text) ---
     if category not in ALLOWED_CATEGORIES:
         category = "Other"
 

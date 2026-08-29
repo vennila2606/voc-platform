@@ -138,3 +138,89 @@ body {
   text-align: center;
 }
 .upload-label { color: var(--text-muted); cursor: pointer; font-size: 0.85rem; }
+
+/* Avatars (default = initials circle) */
+.avatar-fallback {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 1rem;
+  flex-shrink: 0;
+}
+.avatar-img {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+/* Customer review cards (public reviews section) */
+.review-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  height: 100%;
+}
+.review-text-preview {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-bottom: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.star-display { color: #3a4256; font-size: 0.85rem; }
+.star-display .filled { color: #f5b400; }
+
+/* Sentiment badges */
+.sentiment-badge { font-size: 0.72rem; font-weight: 600; padding: 4px 10px; }
+.sentiment-positive { background: rgba(34,197,94,0.18); color: #4ade80; }
+.sentiment-negative { background: rgba(239,68,68,0.18); color: #f87171; }
+.sentiment-neutral  { background: rgba(148,163,184,0.18); color: #cbd5e1; }
+.sentiment-mixed    { background: rgba(251,191,36,0.18); color: #fbbf24; }
+
+/* Item 1: Half-star rating widget */
+.half-star-rating { font-size: 1.9rem; display: inline-flex; gap: 2px; }
+.half-star-slot { position: relative; display: inline-block; width: 1em; cursor: pointer; }
+.half-star-bg { color: #3a4256; user-select: none; }
+.half-star-bg.filled-full { color: #f5b400; }
+.half-star-bg.filled-half {
+  background: linear-gradient(90deg, #f5b400 50%, #3a4256 50%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.half-star-left, .half-star-right {
+  position: absolute; top: 0; height: 100%; width: 50%; z-index: 2;
+}
+.half-star-left { left: 0; }
+.half-star-right { left: 50%; }
+
+/* Item 7: compact review textarea */
+.review-textarea-compact {
+  min-height: 90px;
+  max-height: 160px;
+  resize: vertical;
+}
+
+/* Feedback Journey Timeline */
+.timeline-wrap { max-width: 650px; }
+.timeline-item { display: flex; gap: 14px; align-items: flex-start; }
+.timeline-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  margin-top: 22px; flex-shrink: 0;
+  background: #8892a6;
+}
+.sentiment-dot-positive { background: #4ade80; }
+.sentiment-dot-negative { background: #f87171; }
+.sentiment-dot-neutral { background: #cbd5e1; }
+.sentiment-dot-mixed { background: #fbbf24; }
+.timeline-content { flex: 1; }
+.timeline-connector {
+  text-align: center; color: var(--text-muted);
+  margin-left: 6px; font-size: 1.1rem;
+}

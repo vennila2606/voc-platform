@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ customer.name }}'s Journey{% endblock %}
+{% block content %}
+<div class="container mt-3">
+  <p><a href="{{ url_for('journey_timeline_list') }}" class="switch-link">← Back to customer list</a></p>
+  <h2>{{ customer.name }}'s Feedback Journey</h2>
+  <p class="text-muted-voc">{{ timeline|length }} review(s), oldest to newest.</p>
+
+  <div class="timeline-wrap mt-4">
+    {% for step in timeline %}
+    <div class="timeline-item">
+      <div class="timeline-dot sentiment-dot-{{ (step.sentiment or 'neutral')|lower }}"></div>
+      <div class="timeline-content feedback-card">
+        <div class="d-flex justify-content-between flex-wrap gap-2">
+          <div>
+            <span class="badge sentiment-badge sentiment-{{ (step.sentiment or 'neutral')|lower }}">{{ step.sentiment or "Neutral" }}</span>
+            <span class="fw-semibold ms-2">{{ step.product }}</span>
+          </div>
+          <span class="text-muted-voc" style="font-size:0.8rem;">{{ step.date.strftime("%b %d, %Y") if step.date else "" }}</span>
+        </div>
+        <div class="text-muted-voc mt-1" style="font-size:0.82rem;">
+          Rating: {{ step.rating }}/5 · Category: {{ step.category }}
+          {% if step.issue %} · Issue: {{ step.issue }}{% endif %}
+        </div>
+        <p class="review-text-preview mt-2">"{{ step.review_text }}"</p>
+        <div class="text-muted-voc" style="font-size:0.78rem;">
+          Status: {{ step.status or "New" }}
+          {% if step.support_interaction %} · Support interaction: {{ step.support_interaction }}{% endif %}
+          {% if step.resolution_date %} · Resolved: {{ step.resolution_date.strftime("%b %d, %Y") }}{% endif %}
+        </div>
+      </div>
+    </div>
+    {% if not loop.last %}
+    <div class="timeline-connector">↓</div>
+    {% endif %}
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

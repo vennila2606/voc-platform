@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Feedback Journey Timeline{% endblock %}
+{% block content %}
+<div class="container mt-3">
+  <h2>Feedback Journey Timeline</h2>
+  <p class="text-muted-voc">Customers who've submitted multiple reviews — see how their sentiment changed over time.</p>
+
+  {% if customers %}
+    <div class="feedback-card mt-3">
+      <table class="table table-dark table-borderless" style="font-size:0.9rem;">
+        <thead><tr class="text-muted-voc"><th>Customer</th><th>Reviews Submitted</th><th></th></tr></thead>
+        <tbody>
+          {% for c in customers %}
+          <tr style="border-top:1px solid var(--border);">
+            <td>{{ c.name }}</td>
+            <td>{{ c.review_count }}</td>
+            <td><a href="{{ url_for('journey_timeline', customer_id=c.id) }}" class="btn btn-sm btn-outline-light">View Timeline</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-muted-voc mt-3">No customers with multiple reviews yet — a journey needs at least 2 reviews to show a change over time.</p>
+  {% endif %}
+</div>
+{% endblock %}

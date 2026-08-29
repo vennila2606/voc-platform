@@ -1,0 +1,6 @@
+{# Expects: avatar_name (string), avatar_photo (optional path or None) #}
+{% if avatar_photo %}
+  <img src="{{ url_for('static', filename=avatar_photo) }}" class="avatar-img" alt="{{ avatar_name }}">
+{% else %}
+  <div class="avatar-fallback">{{ (avatar_name or "?")[0]|upper }}</div>
+{% endif %}

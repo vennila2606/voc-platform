@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Weekly Summary History{% endblock %}
+{% block content %}
+<div class="feedback-wrap" style="max-width: 800px;">
+  <h2>Weekly Summary History</h2>
+  <p class="text-muted-voc"><a href="{{ url_for('dashboard') }}" class="switch-link">← Back to Dashboard</a></p>
+
+  {% if summaries %}
+    {% for s in summaries %}
+    <div class="feedback-card mt-3">
+      <div class="d-flex justify-content-between">
+        <div class="fw-semibold">{{ s.period_start.strftime("%b %d") }} – {{ s.period_end.strftime("%b %d, %Y") }}</div>
+        <div class="text-muted-voc" style="font-size:0.75rem;">{{ s.generated_at.strftime("%b %d, %Y %H:%M") }}</div>
+      </div>
+      <p class="text-muted-voc mt-2">{{ s.executive_summary }}</p>
+      <details class="mt-2">
+        <summary class="text-muted-voc" style="cursor:pointer; font-size:0.85rem;">View full summary</summary>
+        <div class="mt-2">
+          <div class="mb-2"><strong>Key Positive Trends:</strong> <span class="text-muted-voc">{{ s.key_positive_trends }}</span></div>
+          <div class="mb-2"><strong>Major Concerns:</strong> <span class="text-muted-voc">{{ s.major_concerns }}</span></div>
+          <div class="mb-2"><strong>Emerging Issues:</strong> <span class="text-muted-voc">{{ s.emerging_issues }}</span></div>
+          <div class="mb-2"><strong>Recommended Actions:</strong> <span class="text-muted-voc">{{ s.recommended_actions }}</span></div>
+          <div><strong>Risk Areas:</strong> <span class="text-muted-voc">{{ s.risk_areas }}</span></div>
+        </div>
+      </details>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p class="text-muted-voc mt-3">No summaries generated yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

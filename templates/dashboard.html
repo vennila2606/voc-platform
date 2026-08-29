@@ -1,0 +1,351 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="container mt-3">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <h2 class="mb-0">Executive Dashboard</h2>
+    <span class="text-muted-voc" id="lastUpdated"></span>
+  </div>
+
+  <!-- Item 11: Filters -->
+  <div class="feedback-card mt-3">
+    <div class="row g-2 align-items-end">
+      <div class="col-6 col-md-2">
+        <label class="form-label">From</label>
+        <input type="date" id="fDateFrom" class="form-control voc-input">
+      </div>
+      <div class="col-6 col-md-2">
+        <label class="form-label">To</label>
+        <input type="date" id="fDateTo" class="form-control voc-input">
+      </div>
+      <div class="col-6 col-md-2">
+        <label class="form-label">Category</label>
+        <select id="fCategory" class="form-select voc-input">
+          <option value="">All</option>
+          {% for c in filter_options.categories %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-2">
+        <label class="form-label">Product</label>
+        <select id="fProduct" class="form-select voc-input">
+          <option value="">All</option>
+          {% for p in filter_options.products %}<option value="{{ p }}">{{ p }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-2">
+        <label class="form-label">Sentiment</label>
+        <select id="fSentiment" class="form-select voc-input">
+          <option value="">All</option>
+          {% for s in filter_options.sentiments %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-2">
+        <label class="form-label">Priority</label>
+        <select id="fPriority" class="form-select voc-input">
+          <option value="">All</option>
+          {% for p in filter_options.priorities %}<option value="{{ p }}">{{ p }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-12">
+        <button id="clearFilters" class="btn btn-sm btn-outline-light mt-2">Clear filters</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Item 9: KPIs -->
+  <div class="row g-3 mt-1" id="kpiRow">
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value" id="kpiTotal">—</div><div class="stat-label">Total Feedback</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value" id="kpiPositive">—</div><div class="stat-label">Positive</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value" id="kpiNegative">—</div><div class="stat-label">Negative</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value" id="kpiNeutral">—</div><div class="stat-label">Neutral/Mixed</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value" id="kpiRating">—</div><div class="stat-label">Average Rating</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value" id="kpiHighPriority">—</div><div class="stat-label">High Priority Issues</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value" id="kpiAuthenticity">—</div><div class="stat-label">Authenticity Rate</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value" id="kpiVHS">—</div><div class="stat-label">Voice Health Score</div><div class="text-muted-voc" style="font-size:0.72rem;">{{ vhs_trend.trend }}</div></div></div>
+  </div>
+
+  <!-- Item 10: Charts -->
+  <div class="row g-3 mt-1">
+    <div class="col-md-6">
+      <div class="feedback-card"><h6>Sentiment Distribution</h6><canvas id="chartSentiment" height="220"></canvas></div>
+    </div>
+    <div class="col-md-6">
+      <div class="feedback-card">
+        <div class="d-flex justify-content-between align-items-center">
+          <h6 class="mb-0">Feedback Trend</h6>
+          <select id="trendGranularity" class="form-select voc-input" style="width:auto; padding:2px 8px; font-size:0.8rem;">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
+        <canvas id="chartTrend" height="220"></canvas>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="feedback-card"><h6>Sentiment Trend</h6><canvas id="chartSentimentTrend" height="220"></canvas></div>
+    </div>
+    <div class="col-md-6">
+      <div class="feedback-card"><h6>Complaint Category Distribution</h6><canvas id="chartCategory" height="220"></canvas></div>
+    </div>
+    <div class="col-md-6">
+      <div class="feedback-card"><h6>Priority Distribution</h6><canvas id="chartPriority" height="220"></canvas></div>
+    </div>
+    <div class="col-md-6">
+      <div class="feedback-card"><h6>Department-wise Issues</h6><canvas id="chartDepartment" height="220"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Item 19: Emerging Issue Radar -->
+  <div class="feedback-card mt-3">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <h5 class="mb-0">Emerging Issue Radar</h5>
+      <a href="{{ url_for('emerging_issues') }}" class="btn btn-sm btn-outline-light">View Full Radar</a>
+    </div>
+    <p class="text-muted-voc" style="font-size:0.8rem;">Issues whose frequency increased 20%+ vs. the previous 7-day period.</p>
+    {% if emerging_issues %}
+      <canvas id="chartEmerging" height="180"></canvas>
+    {% else %}
+      <p class="text-muted-voc">No rapidly increasing issues detected right now.</p>
+    {% endif %}
+  </div>
+
+  <!-- Item 18: Silent Customer Detector link -->
+  <div class="feedback-card mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+      <h5 class="mb-1">Silent Customer Detector</h5>
+      <p class="text-muted-voc mb-0" style="font-size:0.8rem;">Products with high sales but disproportionately low feedback volume.</p>
+    </div>
+    <a href="{{ url_for('silent_customers') }}" class="btn btn-sm btn-outline-light">View Silent Customer Risks</a>
+  </div>
+
+  <!-- Department-wise Action Queue link -->
+  <div class="feedback-card mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+      <h5 class="mb-1">Department-wise Action Queue</h5>
+      <p class="text-muted-voc mb-0" style="font-size:0.8rem;">Open issues grouped by department, automatically prioritized.</p>
+    </div>
+    <a href="{{ url_for('action_queue') }}" class="btn btn-sm btn-outline-light">View Action Queue</a>
+  </div>
+
+  <!-- What-If Simulator link -->
+  <div class="feedback-card mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+      <h5 class="mb-1">What-If Simulator</h5>
+      <p class="text-muted-voc mb-0" style="font-size:0.8rem;">Estimate how resolving an issue would change the Voice Health Score.</p>
+    </div>
+    <a href="{{ url_for('what_if_simulator') }}" class="btn btn-sm btn-outline-light">Open Simulator</a>
+  </div>
+
+  <!-- Feedback Journey Timeline link -->
+  <div class="feedback-card mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+      <h5 class="mb-1">Feedback Journey Timeline</h5>
+      <p class="text-muted-voc mb-0" style="font-size:0.8rem;">See how a customer's sentiment changed across their reviews.</p>
+    </div>
+    <a href="{{ url_for('journey_timeline_list') }}" class="btn btn-sm btn-outline-light">View Timelines</a>
+  </div>
+
+  <!-- Export -->
+  <div class="feedback-card mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+      <h5 class="mb-1">Export Feedback Data</h5>
+      <p class="text-muted-voc mb-0" style="font-size:0.8rem;">Exports the currently filtered feedback.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="#" id="exportCsvBtn" class="btn btn-sm btn-outline-light">Export CSV</a>
+      <a href="#" id="exportJsonBtn" class="btn btn-sm btn-outline-light">Export JSON</a>
+    </div>
+  </div>
+
+  <!-- Item 12: Smart Insights -->
+  <div class="feedback-card mt-3">
+    <h5 class="mb-3">AI-Detected Key Issues</h5>
+    <ol id="insightsList" class="text-muted-voc" style="font-size:0.9rem;"><li>Loading...</li></ol>
+  </div>
+
+  <!-- Item 7: Smart Recommendation Engine -->
+  <div class="feedback-card mt-3">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <h5 class="mb-0">Smart Business Recommendation</h5>
+      <form method="POST" action="{{ url_for('generate_recommendation_route') }}">
+        <button type="submit" class="btn btn-sm btn-primary-glow">⚡ Generate Recommendation</button>
+      </form>
+    </div>
+    {% if latest_recommendation %}
+      <div class="mt-3">
+        <div class="fw-semibold">Main Issue: {{ latest_recommendation.main_issue }}</div>
+        <div class="text-muted-voc mt-1" style="font-size:0.85rem;">Evidence: {{ latest_recommendation.evidence }}</div>
+        <div class="mt-2">{{ latest_recommendation.recommendation }}</div>
+        <div class="text-muted-voc mt-2" style="font-size:0.75rem;">Generated {{ latest_recommendation.generated_at.strftime("%b %d, %Y %H:%M") }}</div>
+      </div>
+    {% else %}
+      <p class="text-muted-voc mt-3">No recommendation generated yet — click the button above.</p>
+    {% endif %}
+  </div>
+
+  <!-- Item 13/14: Weekly Executive Summary -->
+  <div class="feedback-card mt-3 mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <h5 class="mb-0">Weekly Executive Summary</h5>
+      <div class="d-flex gap-2">
+        <a href="{{ url_for('weekly_summary_history') }}" class="btn btn-sm btn-outline-light">View History</a>
+        <form method="POST" action="{{ url_for('generate_weekly_summary_route') }}">
+          <button type="submit" class="btn btn-sm btn-primary-glow">📝 Generate Summary</button>
+        </form>
+      </div>
+    </div>
+    {% if latest_summary %}
+      <p class="text-muted-voc mt-2" style="font-size:0.8rem;">Last Generated: {{ latest_summary.generated_at.strftime("%B %d, %Y") }}</p>
+      <hr style="border-color: var(--border);">
+      <div class="mb-3"><div class="fw-semibold">Executive Summary</div><p class="text-muted-voc">{{ latest_summary.executive_summary }}</p></div>
+      <div class="mb-3"><div class="fw-semibold">Key Positive Trends</div><p class="text-muted-voc">{{ latest_summary.key_positive_trends }}</p></div>
+      <div class="mb-3"><div class="fw-semibold">Major Concerns</div><p class="text-muted-voc">{{ latest_summary.major_concerns }}</p></div>
+      <div class="mb-3"><div class="fw-semibold">Emerging Issues</div><p class="text-muted-voc">{{ latest_summary.emerging_issues }}</p></div>
+      <div class="mb-3"><div class="fw-semibold">Recommended Actions</div><p class="text-muted-voc">{{ latest_summary.recommended_actions }}</p></div>
+      <div class="mb-0"><div class="fw-semibold">Risk Areas</div><p class="text-muted-voc">{{ latest_summary.risk_areas }}</p></div>
+    {% else %}
+      <p class="text-muted-voc mt-3">No summary generated yet — click "Generate Summary" above.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+const chartColors = { positive:'#4ade80', negative:'#f87171', neutral:'#cbd5e1', mixed:'#fbbf24', accent:'#3b9eff' };
+let charts = {};
+
+function currentFilters() {
+  const params = new URLSearchParams();
+  const map = { fDateFrom:'date_from', fDateTo:'date_to', fCategory:'category', fProduct:'product', fSentiment:'sentiment', fPriority:'priority' };
+  for (const [id, key] of Object.entries(map)) {
+    const val = document.getElementById(id).value;
+    if (val) params.set(key, val);
+  }
+  params.set('granularity', document.getElementById('trendGranularity').value);
+  return params;
+}
+
+function destroyChart(id) { if (charts[id]) { charts[id].destroy(); } }
+
+function renderDoughnut(canvasId, dataObj, colorMap) {
+  destroyChart(canvasId);
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  const labels = Object.keys(dataObj);
+  const colors = labels.map(l => colorMap[l.toLowerCase()] || '#8892a6');
+  charts[canvasId] = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data: Object.values(dataObj), backgroundColor: colors }] },
+    options: { plugins: { legend: { labels: { color: '#eaf0fb' } } } }
+  });
+}
+
+function renderBar(canvasId, dataObj) {
+  destroyChart(canvasId);
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  charts[canvasId] = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: Object.keys(dataObj), datasets: [{ data: Object.values(dataObj), backgroundColor: chartColors.accent }] },
+    options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#8892a6' } }, y: { ticks: { color: '#8892a6' } } } }
+  });
+}
+
+function renderLine(canvasId, dataObj) {
+  destroyChart(canvasId);
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  charts[canvasId] = new Chart(ctx, {
+    type: 'line',
+    data: { labels: Object.keys(dataObj), datasets: [{ data: Object.values(dataObj), borderColor: chartColors.accent, backgroundColor: 'rgba(59,158,255,0.15)', fill: true, tension: 0.3 }] },
+    options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#8892a6' } }, y: { ticks: { color: '#8892a6' } } } }
+  });
+}
+
+function renderSentimentTrend(canvasId, dataObj) {
+  destroyChart(canvasId);
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  const labels = Object.keys(dataObj);
+  const series = ['Positive', 'Negative', 'Neutral', 'Mixed'];
+  const colorFor = { Positive: chartColors.positive, Negative: chartColors.negative, Neutral: chartColors.neutral, Mixed: chartColors.mixed };
+  const datasets = series.map(s => ({
+    label: s, data: labels.map(l => dataObj[l][s] || 0), borderColor: colorFor[s], backgroundColor: colorFor[s], tension: 0.3
+  }));
+  charts[canvasId] = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: { plugins: { legend: { labels: { color: '#eaf0fb' } } }, scales: { x: { ticks: { color: '#8892a6' } }, y: { ticks: { color: '#8892a6' } } } }
+  });
+}
+
+async function loadDashboard() {
+  const params = currentFilters();
+  const res = await fetch('/dashboard-data?' + params.toString());
+  const data = await res.json();
+
+  document.getElementById('kpiTotal').textContent = data.kpis.total_feedback;
+  document.getElementById('kpiPositive').textContent = data.kpis.positive_pct + '%';
+  document.getElementById('kpiNegative').textContent = data.kpis.negative_pct + '%';
+  document.getElementById('kpiNeutral').textContent = data.kpis.neutral_mixed_pct + '%';
+  document.getElementById('kpiRating').textContent = data.kpis.average_rating != null ? data.kpis.average_rating + ' / 5' : '—';
+  document.getElementById('kpiHighPriority').textContent = data.kpis.high_priority_count;
+  document.getElementById('kpiAuthenticity').textContent = data.kpis.authenticity_rate != null ? data.kpis.authenticity_rate + '%' : '—';
+  document.getElementById('kpiVHS').textContent = data.kpis.voice_health_score != null ? data.kpis.voice_health_score + ' / 100' : '—';
+
+  renderDoughnut('chartSentiment', data.sentiment_distribution, { positive: chartColors.positive, negative: chartColors.negative, neutral: chartColors.neutral, mixed: chartColors.mixed });
+  renderLine('chartTrend', data.feedback_trend);
+  renderSentimentTrend('chartSentimentTrend', data.sentiment_trend);
+  renderBar('chartCategory', data.category_distribution);
+  renderBar('chartPriority', data.priority_distribution);
+  renderBar('chartDepartment', data.department_distribution);
+
+  const list = document.getElementById('insightsList');
+  list.innerHTML = '';
+  data.insights.forEach(i => { const li = document.createElement('li'); li.textContent = i; list.appendChild(li); });
+
+  document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+}
+
+['fDateFrom','fDateTo','fCategory','fProduct','fSentiment','fPriority','trendGranularity'].forEach(id => {
+  document.getElementById(id).addEventListener('change', loadDashboard);
+});
+document.getElementById('clearFilters').addEventListener('click', () => {
+  ['fDateFrom','fDateTo','fCategory','fProduct','fSentiment','fPriority'].forEach(id => document.getElementById(id).value = '');
+  loadDashboard();
+});
+
+// Item 19: Emerging Issue Radar chart (bar: % increase per issue)
+async function loadEmergingIssuesChart() {
+  const canvas = document.getElementById('chartEmerging');
+  if (!canvas) return;  // hidden when there's no emerging issues (server-rendered check)
+  const res = await fetch('/emerging-issues-data');
+  const issues = await res.json();
+  const ctx = canvas.getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: issues.map(i => i.issue),
+      datasets: [{
+        label: '% Increase',
+        data: issues.map(i => i.percentage_increase),
+        backgroundColor: issues.map(i => i.severity === 'Critical' ? chartColors.negative : i.severity === 'High' ? '#fbbf24' : chartColors.accent)
+      }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#8892a6' } }, y: { ticks: { color: '#8892a6' } } } }
+  });
+}
+
+loadDashboard();
+loadEmergingIssuesChart();
+
+// Export CSV/JSON — reuses the same filter state as the charts
+document.getElementById('exportCsvBtn').addEventListener('click', (e) => {
+  e.preventDefault();
+  window.location.href = '/admin/export?format=csv&' + currentFilters().toString();
+});
+document.getElementById('exportJsonBtn').addEventListener('click', (e) => {
+  e.preventDefault();
+  window.location.href = '/admin/export?format=json&' + currentFilters().toString();
+});
+</script>
+{% endblock %}

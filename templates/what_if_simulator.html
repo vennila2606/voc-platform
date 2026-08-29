@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}What-If Simulator{% endblock %}
+{% block content %}
+<div class="container mt-3">
+  <h2>What-If Simulator</h2>
+  <p class="text-muted-voc">Estimate how the Voice Health Score would change if a selected issue were resolved.</p>
+
+  <div class="feedback-card mt-3">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-5">
+        <label class="form-label">Select Issue</label>
+        <select id="issueSelect" class="form-select voc-input">
+          <option value="">Choose an issue...</option>
+          {% for issue in issues %}
+          <option value="{{ issue }}">{{ issue }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-5">
+        <label class="form-label">Reduce Issue By</label>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-sm btn-outline-light reduction-btn" data-value="25">25%</button>
+          <button type="button" class="btn btn-sm btn-outline-light reduction-btn active" data-value="50">50%</button>
+          <button type="button" class="btn btn-sm btn-outline-light reduction-btn" data-value="75">75%</button>
+          <button type="button" class="btn btn-sm btn-outline-light reduction-btn" data-value="100">100%</button>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <button id="runSimBtn" class="btn btn-primary-glow w-100">Simulate</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="feedback-card mt-3" id="resultsCard" style="display:none;">
+    <div class="row text-center g-3">
+      <div class="col-4">
+        <div class="stat-value" id="currentVHS">—</div>
+        <div class="stat-label">Current VHS</div>
+      </div>
+      <div class="col-4">
+        <div class="stat-value" id="predictedVHS" style="color: var(--accent);">—</div>
+        <div class="stat-label">Predicted VHS</div>
+      </div>
+      <div class="col-4">
+        <div class="stat-value" id="deltaVHS">—</div>
+        <div class="stat-label">Change</div>
+      </div>
+    </div>
+    <p class="text-muted-voc mt-3 text-center" id="simNote"></p>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  let reductionPct = 50;
+  document.querySelectorAll('.reduction-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.reduction-btn').forEach(b => b.classList.remove('active', 'btn-primary-glow'));
+      document.querySelectorAll('.reduction-btn').forEach(b => b.classList.add('btn-outline-light'));
+      btn.classList.remove('btn-outline-light');
+      btn.classList.add('active', 'btn-primary-glow');
+      reductionPct = parseInt(btn.dataset.value);
+    });
+  });
+
+  document.getElementById('runSimBtn').addEventListener('click', async () => {
+    const issue = document.getElementById('issueSelect').value;
+    if (!issue) { alert('Please select an issue first.'); return; }
+
+    const res = await fetch(`/what-if-data?issue=${encodeURIComponent(issue)}&reduction_pct=${reductionPct}`);
+    const data = await res.json();
+
+    document.getElementById('resultsCard').style.display = 'block';
+    document.getElementById('currentVHS').textContent = data.current_vhs != null ? data.current_vhs : '—';
+    document.getElementById('predictedVHS').textContent = data.predicted_vhs != null ? data.predicted_vhs : '—';
+    const delta = data.delta;
+    document.getElementById('deltaVHS').textContent = delta != null ? (delta >= 0 ? '+' + delta : delta) : '—';
+
+    if (data.note) {
+      document.getElementById('simNote').textContent = data.note;
+    } else {
+      document.getElementById('simNote').textContent =
+        `Resolving ${data.reduction_pct}% of the ${data.affected_count} review(s) tagged "${data.issue}" ` +
+        `(the most negative ${data.resolved_count} of them) could shift the Voice Health Score by ${delta >= 0 ? '+' : ''}${delta} points.`;
+    }
+  });
+</script>
+{% endblock %}

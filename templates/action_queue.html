@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Department Action Queue{% endblock %}
+{% block content %}
+<div class="container mt-3">
+  <h2>Department-wise Action Queue</h2>
+  <p class="text-muted-voc">Issues grouped by department, sorted by priority — automatically prioritized.</p>
+
+  <div class="d-flex gap-2 mb-3">
+    <a href="{{ url_for('action_queue') }}" class="btn btn-sm {{ 'btn-primary-glow' if not status_filter else 'btn-outline-light' }}">All</a>
+    <a href="{{ url_for('action_queue', status='Pending') }}" class="btn btn-sm {{ 'btn-primary-glow' if status_filter == 'Pending' else 'btn-outline-light' }}">Pending</a>
+    <a href="{{ url_for('action_queue', status='In Progress') }}" class="btn btn-sm {{ 'btn-primary-glow' if status_filter == 'In Progress' else 'btn-outline-light' }}">In Progress</a>
+    <a href="{{ url_for('action_queue', status='Resolved') }}" class="btn btn-sm {{ 'btn-primary-glow' if status_filter == 'Resolved' else 'btn-outline-light' }}">Resolved</a>
+  </div>
+
+  {% if queue %}
+    {% for item in queue %}
+    <div class="feedback-card mt-3">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <div>
+          <span class="badge sentiment-badge {{ 'sentiment-negative' if item.priority in ['Critical','High'] else 'sentiment-mixed' if item.priority == 'Medium' else 'sentiment-positive' }}">
+            {{ item.priority or "Low" }}
+          </span>
+          <span class="fw-semibold ms-2">{{ item.issue }}</span>
+          <div class="text-muted-voc mt-1" style="font-size:0.82rem;">
+            Department: {{ item.department }} · {{ item.affected_customers }} affected customer(s)
+            {% if item.category %} · Category: {{ item.category }}{% endif %}
+            {% if item.earliest_date %} · First identified: {{ item.earliest_date.strftime("%b %d, %Y") }}{% endif %}
+          </div>
+        </div>
+        <form method="POST" action="{{ url_for('action_queue_update_status') }}" class="d-flex gap-2 align-items-center">
+          <input type="hidden" name="feedback_ids" value="{{ item.feedback_ids | join(',') }}">
+          <select name="status" class="form-select voc-input" style="width:auto; font-size:0.8rem;" onchange="this.form.submit()">
+            <option value="New" {{ "selected" if item.status == "Pending" or item.status == "New" }}>Pending</option>
+            <option value="In Progress" {{ "selected" if item.status == "In Progress" }}>In Progress</option>
+            <option value="Resolved" {{ "selected" if item.status == "Resolved" }}>Resolved</option>
+          </select>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p class="text-muted-voc mt-3">No action items match this filter.</p>
+  {% endif %}
+</div>
+{% endblock %}

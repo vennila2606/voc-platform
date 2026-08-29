@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Topic Breakdown{% endblock %}
+{% block content %}
+<div class="feedback-wrap" style="max-width: 800px;">
+  <h2>Feedback Breakdown</h2>
+  <p class="text-muted-voc">{{ total }} total feedback entries — grouped by AI-detected topic, sentiment, and priority.</p>
+
+  <div class="feedback-card mt-4">
+    <h5 class="mb-3">By Topic</h5>
+    {% if topic_counts %}
+      {% for topic, count in topic_counts %}
+      <div class="d-flex justify-content-between align-items-center py-2" style="border-bottom:1px solid var(--border);">
+        <span>{{ topic or "Unclassified" }}</span>
+        <span class="badge bg-primary rounded-pill">{{ count }}</span>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-muted-voc">No feedback yet — submit some through the feedback form first.</p>
+    {% endif %}
+  </div>
+
+  <div class="feedback-card mt-4">
+    <h5 class="mb-3">By Sentiment</h5>
+    {% for sentiment, count in sentiment_counts %}
+    <div class="d-flex justify-content-between align-items-center py-2" style="border-bottom:1px solid var(--border);">
+      <span>
+        {% if sentiment == "Positive" %}🟢{% elif sentiment == "Negative" %}🔴{% else %}⚪{% endif %}
+        {{ sentiment or "Unclassified" }}
+      </span>
+      <span class="badge bg-secondary rounded-pill">{{ count }}</span>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="feedback-card mt-4">
+    <h5 class="mb-3">By Priority</h5>
+    {% for priority, count in priority_counts %}
+    <div class="d-flex justify-content-between align-items-center py-2" style="border-bottom:1px solid var(--border);">
+      <span>
+        {% if priority == "Critical" %}🔥{% elif priority == "High" %}⚠️{% elif priority == "Medium" %}🟡{% else %}🟢{% endif %}
+        {{ priority or "Unclassified" }}
+      </span>
+      <span class="badge bg-secondary rounded-pill">{{ count }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
