@@ -7,3 +7,4 @@ qrcode==7.4.2
 Pillow>=11.1.0
 textblob==0.18.0.post0
 requests==2.32.3
+
