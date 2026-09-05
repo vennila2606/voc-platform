@@ -155,3 +155,4 @@ class SalesData(db.Model):
     sales_count = db.Column(db.Integer, nullable=False)
     period_label = db.Column(db.String(50), nullable=True)  # e.g. "August 2026" — informational only
     imported_at = db.Column(db.DateTime, default=datetime.utcnow)
+
